@@ -254,7 +254,7 @@ func (f *TextFormatter) printColored(b *bytes.Buffer, entry *logrus.Entry, keys 
 		levelText = strings.ToUpper(levelText)
 	}
 
-	level := levelColor(fmt.Sprintf("%5s", levelText))
+	level := levelColor(levelText)
 	prefix := ""
 	message := entry.Message
 
@@ -278,18 +278,25 @@ func (f *TextFormatter) printColored(b *bytes.Buffer, entry *logrus.Entry, keys 
 
 	callContextParts := []string{}
 	if ifile, ok := entry.Data["file"]; ok {
-		if sfile, ok := ifile.(string); ok {
+		if sfile, ok := ifile.(string); ok && sfile != "" {
 			callContextParts = append(callContextParts, sfile)
 		}
 	}
 	if ifunc, ok := entry.Data["func"]; ok {
-		if sfunc, ok := ifunc.(string); ok {
+		if sfunc, ok := ifunc.(string); ok && sfunc != "" {
 			callContextParts = append(callContextParts, sfunc)
 		}
 	}
 	if iline, ok := entry.Data["line"]; ok {
-		if sline, ok := iline.(string); ok {
-			callContextParts = append(callContextParts, sline)
+		sline := ""
+		switch iline.(type) {
+		case string:
+			sline = iline.(string)
+		case int, uint, int32, int64, uint32, uint64:
+			sline = fmt.Sprint(sline)
+		}
+		if sline != "" {
+			callContextParts = append(callContextParts, fmt.Sprint(sline))
 		}
 	}
 	callContext := strings.Join(callContextParts, ":")
