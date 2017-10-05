@@ -114,6 +114,9 @@ type TextFormatter struct {
 	// Its default value is zero, which means no padding will be applied for msg.
 	SpacePadding int
 
+	// Always use quotes for string values (except for empty fields)
+	AlwaysQuoteStrings bool
+
 	// Color scheme to use.
 	colorScheme *compiledColorScheme
 
@@ -329,17 +332,21 @@ func (f *TextFormatter) printColored(b *bytes.Buffer, entry *logrus.Entry, keys 
 }
 
 func (f *TextFormatter) needsQuoting(text string) bool {
-	if f.QuoteEmptyFields && len(text) == 0 {
+	if len(text) == 0 {
+		return f.QuoteEmptyFields
+	} else if f.AlwaysQuoteStrings {
 		return true
 	}
+
 	for _, ch := range text {
 		if !((ch >= 'a' && ch <= 'z') ||
 			(ch >= 'A' && ch <= 'Z') ||
 			(ch >= '0' && ch <= '9') ||
-			ch == '-' || ch == '.' || ch == ' ') {
+			ch == '-' || ch == '.') {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -366,10 +373,10 @@ func (f *TextFormatter) appendKeyValue(b *bytes.Buffer, key string, value interf
 func (f *TextFormatter) appendValue(b *bytes.Buffer, value interface{}) {
 	switch value := value.(type) {
 	case string:
-		if !f.needsQuoting(value) {
-			b.WriteString(value)
-		} else {
+		if f.needsQuoting(value) {
 			fmt.Fprintf(b, "%s%v%s", f.QuoteCharacter, value, f.QuoteCharacter)
+		} else {
+			b.WriteString(value)
 		}
 	case error:
 		errmsg := value.Error()
