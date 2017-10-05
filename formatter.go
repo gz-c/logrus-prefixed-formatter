@@ -314,7 +314,7 @@ func (f *TextFormatter) printColored(b *bytes.Buffer, entry *logrus.Entry, keys 
 	}
 
 	for _, k := range keys {
-		if k != "prefix" {
+		if k != "prefix" && k != "file" && k != "func" && k != "line" {
 			v := entry.Data[k]
 			fmt.Fprintf(b, " %s=%+v", levelColor(k), v)
 		}
