@@ -1,7 +1,7 @@
 package prefixed_test
 
 import (
-	. "github.com/x-cray/logrus-prefixed-formatter"
+	. "github.com/gz-c/logrus-prefixed-formatter"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
