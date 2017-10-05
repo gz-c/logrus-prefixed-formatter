@@ -299,7 +299,7 @@ func (f *TextFormatter) printColored(b *bytes.Buffer, entry *logrus.Entry, keys 
 	}
 
 	if f.DisableTimestamp {
-		fmt.Fprintf(b, "%s%s%s"+messageFormat, level, prefix, callContext, message)
+		fmt.Fprintf(b, "%s%s%s"+messageFormat, callContext, level, prefix, message)
 	} else {
 		var timestamp string
 		if !f.FullTimestamp {
@@ -310,7 +310,7 @@ func (f *TextFormatter) printColored(b *bytes.Buffer, entry *logrus.Entry, keys 
 
 		coloredTimestamp := colorScheme.TimestampColor(timestamp)
 
-		fmt.Fprintf(b, "%s %s%s%s"+messageFormat, coloredTimestamp, level, prefix, callContext, message)
+		fmt.Fprintf(b, "%s %s%s%s"+messageFormat, coloredTimestamp, callContext, level, prefix, message)
 	}
 
 	for _, k := range keys {
@@ -329,7 +329,7 @@ func (f *TextFormatter) needsQuoting(text string) bool {
 		if !((ch >= 'a' && ch <= 'z') ||
 			(ch >= 'A' && ch <= 'Z') ||
 			(ch >= '0' && ch <= '9') ||
-			ch == '-' || ch == '.') {
+			ch == '-' || ch == '.' || ch == ' ') {
 			return true
 		}
 	}
